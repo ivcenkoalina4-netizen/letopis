@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ЛЕТОПИСЬ звуковой культуры</title>
+<link rel="icon" type="image/png" href="img/favicon.jpeg">
+<meta name="description" content="Интерактивная история звуковой культуры: от классицизма до электроники. Визуальное путешествие по эпохам, странам, архитекторам звука и технологиям.">
+
+<meta property="og:title" content="ЛЕТОПИСЬ звуковой культуры">
+<meta property="og:description" content="Интерактивная история музыки — эпохи, страны, композиторы, технологии и артефакты.">
+<meta property="og:image" content="img/preview.jpeg">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#1e1610;
+    --bg-photo:#2a1f14;
+    --cream:#f3ead9;
+    --cream-soft:#efe3cd;
+    --ink:#2a1f14;
+    --gold:#c9a227;
+    --gold-soft:#d9b96a;
+    --muted:#8a7a63;
+    --card:#261c14;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg-deep);
+    color:var(--cream);
+    font-family:'Inter', system-ui, sans-serif;
+    line-height:1.6;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.serif{font-family:'Cormorant Garamond', Georgia, serif; font-weight:400}
+
+  /* ХЕДЕР */
+  header{
+    position:relative; min-height:70vh;
+    display:flex; flex-direction:column; justify-content:center; align-items:center;
+    text-align:center; padding:80px 24px 60px;
+    background:
+      linear-gradient(rgba(30,22,16,.82), rgba(30,22,16,.96)),
+      url('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=1600&q=80') center/cover;
+    border-bottom:1px solid rgba(201,162,39,.15);
+  }
+  header::after{
+    content:''; position:absolute; inset:0;
+    background:radial-gradient(circle at 50% 40%, rgba(201,162,39,.12), transparent 60%);
+    pointer-events:none;
+  }
+  header h1{
+    font-size:clamp(3rem,11vw,8rem);
+    letter-spacing:.06em; text-transform:uppercase; line-height:.95;
+    color:var(--cream); text-shadow:0 4px 40px rgba(0,0,0,.5);
+    position:relative; z-index:1;
+  }
+  header .subtitle{
+    font-family:'Cormorant Garamond', serif; font-style:italic;
+    font-size:clamp(1rem,2.5vw,1.4rem); color:var(--gold-soft);
+    margin-top:18px; position:relative; z-index:1; max-width:600px;
+  }
+  header .divider{width:60px;height:1px;background:var(--gold);margin:28px auto 0;position:relative;z-index:1}
+
+  /* ТАЙМЛАЙН */
+  .timeline-section{background:var(--cream);color:var(--ink);padding:70px 24px 50px}
+  .section-head{text-align:center;margin-bottom:36px}
+  .section-head h2{font-size:clamp(2rem,5vw,3.4rem);color:var(--ink);letter-spacing:.02em}
+  .section-head p{font-size:.85rem;color:var(--muted);letter-spacing:.2em;text-transform:uppercase;margin-top:8px}
+  .timeline-wrap{max-width:1200px;margin:0 auto}
+  .timeline{
+    display:flex; height:140px;
+    border:1px solid rgba(42,31,20,.15); border-radius:6px; overflow:hidden;
+    background:var(--cream-soft);
+  }
+  .segment{
+    flex:1; cursor:pointer; border-right:1px solid rgba(42,31,20,.12);
+    padding:18px 20px; display:flex; flex-direction:column; justify-content:center;
+    transition:background .3s, flex .3s; position:relative;
+  }
+  .segment:last-child{border-right:none}
+  .segment:hover{background:#e8dcc2}
+  .segment.active{background:#e6d5ad}
+  .segment.active::after{content:'';position:absolute;left:0;bottom:0;width:100%;height:3px;background:var(--gold)}
+  .segment .era-years{font-size:.75rem;letter-spacing:.15em;color:var(--muted);text-transform:uppercase}
+  .segment .era-name{font-family:'Cormorant Garamond', serif;font-size:1.6rem;margin-top:6px;color:var(--ink)}
+  .segment .era-sub{font-size:.78rem;color:var(--muted);margin-top:2px}
+  @media(max-width:760px){
+    .timeline{overflow-x:auto;height:120px}
+    .segment{min-width:160px}
+  }
+
+  /* СТРАНЫ */
+  .country-bar{
+    display:flex; flex-wrap:wrap; gap:12px; justify-content:center;
+    max-width:1200px; margin:0 auto; padding:40px 24px;
+    background:var(--cream); color:var(--ink);
+  }
+  .country-btn{
+    background:transparent; color:var(--ink);
+    border:1px solid rgba(42,31,20,.25);
+    padding:10px 26px; border-radius:40px;
+    cursor:pointer; font-family:'Inter',sans-serif;
+    font-size:.85rem; letter-spacing:.08em; transition:all .25s;
+  }
+  .country-btn:hover{border-color:var(--gold);color:var(--gold)}
+  .country-btn.active{background:var(--gold);color:var(--bg-deep);border-color:var(--gold)}
+
+  /* КОНТЕНТ */
+  .epoch-content{display:none; animation:fadeUp .6s ease; background:var(--cream); color:var(--ink); padding:0 0 80px}
+  .epoch-content.visible{display:block}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+
+  .epoch-hero{max-width:1200px;margin:0 auto;padding:60px 24px 40px;text-align:center;position:relative}
+  .epoch-hero .years{color:var(--gold);letter-spacing:.3em;font-size:.8rem;text-transform:uppercase}
+  .epoch-hero h2{font-size:clamp(2.8rem,8vw,6rem);margin:14px 0 8px;line-height:1}
+  .epoch-hero .country-tag{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.2rem;color:var(--muted)}
+  .ambient-btn{
+    margin-top:28px; background:var(--ink); color:var(--cream);
+    border:none; padding:14px 34px; border-radius:40px;
+    font-family:'Inter',sans-serif; font-size:.9rem; letter-spacing:.1em;
+    cursor:pointer; display:inline-flex; align-items:center; gap:10px;
+    transition:transform .2s, background .2s;
+  }
+  .ambient-btn:hover{transform:scale(1.04);background:var(--gold);color:var(--bg-deep)}
+  .ambient-btn.playing{animation:pulse 1.2s infinite}
+  @keyframes pulse{50%{box-shadow:0 0 0 12px rgba(201,162,39,.15)}}
+
+  .blocks{display:grid;grid-template-columns:1fr;gap:28px;max-width:1200px;margin:40px auto 0;padding:0 24px}
+  @media(min-width:900px){
+    .blocks{grid-template-columns:1fr 1fr}
+    .block-wide{grid-column:1 / -1}
+  }
+  .block{background:#fbf5e8;border:1px solid rgba(42,31,20,.08);border-radius:8px;padding:34px;box-shadow:0 6px 24px rgba(42,31,20,.06)}
+  .block h3{font-family:'Inter',sans-serif;font-size:.72rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);margin-bottom:18px;font-weight:500}
+  .block p{color:#3a2c1e;font-size:.98rem}
+  .block .sub{color:var(--muted);font-size:.82rem;margin-top:14px;font-style:italic}
+
+  /* АРХИТЕКТОРЫ */
+  .architects{display:flex;gap:16px;overflow-x:auto;padding-bottom:12px;scrollbar-width:thin}
+  .architects::-webkit-scrollbar{height:6px}
+  .architects::-webkit-scrollbar-thumb{background:rgba(42,31,20,.2);border-radius:3px}
+  .architect{
+    min-width:170px; background:var(--cream-soft); border-radius:6px;
+    padding:16px; cursor:pointer; border:1px solid transparent;
+    transition:border .25s, transform .25s; text-align:center;
+  }
+  .architect:hover{border-color:var(--gold);transform:translateY(-2px)}
+  .architect .avatar{
+    width:100%; height:110px; border-radius:4px;
+    background:linear-gradient(135deg,#d9c9a8,#c4b08a);
+    margin-bottom:12px; display:flex; align-items:center; justify-content:center;
+    color:rgba(42,31,20,.4); font-size:.7rem; letter-spacing:.1em;
+    overflow:hidden; position:relative;
+  }
+  .architect .avatar img{width:100%;height:100%;object-fit:cover}
+  .architect .name{font-family:'Cormorant Garamond',serif;font-size:1.15rem;color:var(--ink)}
+  .architect .role{font-size:.75rem;color:var(--muted);margin-top:2px}
+
+  /* ТЕХНОЛОГИИ */
+  .tech-list{list-style:none}
+  .tech-list li{display:flex;gap:14px;padding:12px 0;border-bottom:1px dashed rgba(42,31,20,.15);font-size:.92rem;color:#3a2c1e}
+  .tech-list li:last-child{border-bottom:none}
+  .tech-list .year{color:var(--gold);font-weight:500;min-width:56px;font-family:'Cormorant Garamond',serif;font-size:1.1rem}
+
+  /* ГАЛЕРЕЯ */
+  .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px}
+  .artifact{
+    aspect-ratio:1; border-radius:6px; overflow:hidden;
+    background:linear-gradient(135deg,#d9c9a8,#b9a47e);
+    display:flex; align-items:center; justify-content:center;
+    color:rgba(42,31,20,.55); font-size:.8rem; text-align:center;
+    padding:12px; cursor:pointer; position:relative;
+    border:1px solid rgba(42,31,20,.08); transition:transform .25s;
+  }
+  .artifact:hover{transform:scale(1.04)}
+  .artifact img{width:100%;height:100%;object-fit:cover}
+  .artifact span{position:relative;z-index:1}
+
+  /* КНОПКА "ДАЛЬШЕ" */
+  .next-era{text-align:center;margin-top:56px;padding:0 24px}
+  .next-era button{
+    background:transparent;color:var(--ink);border:1px solid var(--ink);
+    padding:16px 44px;border-radius:40px;font-family:'Inter',sans-serif;
+    font-size:.9rem;letter-spacing:.15em;text-transform:uppercase;
+    cursor:pointer;transition:all .25s;
+  }
+  .next-era button:hover{background:var(--ink);color:var(--cream)}
+
+  .placeholder{
+    text-align:center;color:var(--muted);padding:60px 24px;font-style:italic;
+    font-family:'Cormorant Garamond',serif;font-size:1.3rem;max-width:1200px;margin:0 auto;
+  }
+  .placeholder strong{color:var(--gold);font-style:normal}
+
+  .epoch-footer{
+    margin-top:70px;background:var(--bg-deep);color:var(--cream);
+    padding:50px 24px;text-align:center;
+  }
+  .epoch-footer h4{font-family:'Cormorant Garamond',serif;font-size:2rem;color:var(--gold-soft);letter-spacing:.05em;margin-bottom:10px}
+  .epoch-footer p{color:var(--muted);font-size:.85rem;letter-spacing:.1em}
+
+  audio{display:none}
+
+  .artifact-item{margin:0;text-align:center}
+  .artifact-item figcaption{
+    font-size:.78rem;color:#5a4a36;margin-top:6px;
+    font-family:'Cormorant Garamond',serif;font-style:italic;
+  }
+</style>
+</head>
+<body>
+
+<!-- ХЕДЕР -->
+<header>
+  <h1>Летопись</h1>
+  <p class="subtitle">интерактивная история звуковой культуры — от классицизма до электроники</p>
+  <div class="divider"></div>
+</header>
+
+<!-- ТАЙМЛАЙН -->
+<section class="timeline-section">
+  <div class="section-head">
+    <h2>Выберите эпоху</h2>
+    <p>четыре отрезка времени</p>
+  </div>
+  <div class="timeline-wrap"><div class="timeline" id="timeline"></div></div>
+</section>
+
+<!-- СТРАНЫ -->
+<section class="country-bar" id="countryBar"></section>
+
+<!-- КОНТЕНТ -->
+<main class="epoch-content" id="epochContent"></main>
+
+<!-- НЕВИДИМЫЙ ПЛЕЕР -->
+<audio id="player" preload="none"></audio>
+
+<script>
+/* =========================================================
+   1. ДАННЫЕ
+   ========================================================= */
+const ERAS = [
+  {
+    id:'classic', years:'1750–1820', name:'Классицизм', sub:'Вена · симфонии · салоны',
+    hero:'img/fullsize.jpg',
+    ambient:'audio/classic.mp3',
+    spirit:'Классицизм (от лат. classicus — «образцовый») зародился во Франции XVII века, а к XVIII веку центр музыкальной Европы сместился в Вену. Композиторы впервые прославляли не Бога, а личность и природу человека. Эпоха Просвещения дала музыке ясность, чёткость, симметрию и сдержанность чувств. Высшая форма — симфония, а сонатная форма окончательно оформилась у Гайдна и Моцарта, а Бетховен разрушил её строгие каноны.',
+    countries:{
+      Austria:{
+        architects:[
+          {name:'Йозеф Гайдн',role:'основоположник классицизма',photo:'img/haydn.jpg'},
+          {name:'В. А. Моцарт',role:'симфония, опера',photo:'img/mozart.jpg'},
+          {name:'Л. ван Бетховен',role:'переход к романтизму',photo:'img/bethoven.jpg'}
+        ],
+        tech:[
+          {year:'1750',text:'Фортепиано вытесняет клавесин и клавикорд'},
+          {year:'1760',text:'Печатный станок для нот — ноты становятся массовыми'},
+          {year:'1790',text:'Кларнет и фагот входят в симфонический оркестр'},
+          {year:'1800',text:'Метроном Мельцеля — ритм становится точным'},
+          {year:'1808',text:'В Пятой симфонии Бетховена впервые звучит тромбон'}
+        ],
+        artifacts:[
+  {name:'Партитура симфонии', img:'img/score.jpg'},
+  {name:'Клавесин',           img:'img/harpsichord.jpeg'},
+  {name:'Салонная мода',      img:'img/fashion.jpg'},
+  {name:'Оркестровая яма',    img:'img/pit.jpeg'},
+  {name:'Парик композитора',  img:'img/wig.jpg'},
+  {name:'Ноты рукописи',      img:'img/manuscript.jpg'}
+],
+        audio:'https://upload.wikimedia.org/wikipedia/commons/1/1e/Mozart_-_Eine_kleine_Nachtmusik_-_1._Allegro.ogg'
+      },
+      Germany:{
+        architects:[
+          {name:'И. С. Бах',role:'полифония (позднее барокко)',photo:'img/Бах.jpg'},
+          {name:'Л. ван Бетховен',role:'симфонизм',photo:'img/bethoven.jpg'}
+        ],
+        tech:[
+          {year:'1750',text:'Усовершенствование клавикорда'},
+          {year:'1800',text:'Метроном Мельцеля'}
+        ],
+        artifacts:['Орган','Нотная тетрадь','Портрет композитора'],
+        audio:'https://upload.wikimedia.org/wikipedia/commons/6/6e/Beethoven_Symphony_5.ogg'
+      },
+      France:{
+        architects:[
+          {name:'Ж. Ф. Рамо',role:'теория гармонии',photo:'img/rameau.jpg'},
+          {name:'К. В. Глюк',role:'реформа оперы',photo:'img/gluck.jpg'}
+        ],
+        tech:[{year:'1752',text:'«Война буффонов» — спор о французской и итальянской опере'}],
+        artifacts:['Оперный театр','Костюм певца','Афиша'],
+        audio:''
+      }
+    }
+  },
+  {
+    id:'jazz', years:'1900–1950', name:'Джаз', sub:'Новый Орлеан · Чикаго · Нью-Йорк',
+    hero:'img/jazz-bg.jpeg',
+    ambient:'audio/jazz.mp3',
+    spirit:'Джаз зародился в США на рубеже XIX–XX веков на стыке африканской и европейской культур. После отмены рабства тяжёлая участь бывших невольников отразилась в блюзе, а из маршей военных оркестров и спиричуэлс вырос новоорлеанский джаз (Джелли Ролл Мортон, Бадди Болден). В 1917 году центр сместился в Чикаго, где в состав вошли саксофон и фортепиано, а Луи Армстронг начал петь. В 1940-х бибоп (Чарли Паркер, Диззи Гиллеспи) ускорил темп и усложнил импровизацию.',
+    countries:{
+      USA:{
+        architects:[
+          {name:'Луи Армстронг',role:'труба, вокал',photo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Louis_Armstrong.jpg/240px-Louis_Armstrong.jpg'},
+          {name:'Джелли Ролл Мортон',role:'новоорлеанский джаз',photo:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Jelly_Roll_Morton.jpg/240px-Jelly_Roll_Morton.jpg'},
+          {name:'Чарли Паркер',role:'бибоп',photo:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Charlie_Parker.jpg/240px-Charlie_Parker.jpg'},
+          {name:'Диззи Гиллеспи',role:'бибоп',photo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Dizzy_Gillespie.jpg/240px-Dizzy_Gillespie.jpg'}
+        ],
+        tech:[
+          {year:'1925',text:'Электрорекординг — качество записи растёт'},
+          {year:'1931',text:'Первая электрогитара (Rickenbacker)'},
+          {year:'1940',text:'Свинг — новый ритмический рисунок'},
+          {year:'1948',text:'LP-пластинка — альбом как формат'}
+        ],
+        artifacts:['Обложка Blue Note','Граммофон','Костюм зутсутера','Клуб Minton’s','Саксофон','Винил 78 rpm'],
+        audio:'https://upload.wikimedia.org/wikipedia/commons/9/9a/Louis_Armstrong_-_What_a_Wonderful_World.ogg'
+      },
+      France:{
+        architects:[
+          {name:'Джанго Рейнхардт',role:'гипси-джаз',photo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Django_Reinhardt.jpg/240px-Django_Reinhardt.jpg'},
+          {name:'Стефан Граппелли',role:'скрипка',photo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Stephane_Grappelli.jpg/240px-Stephane_Grappelli.jpg'}
+        ],
+        tech:[{year:'1934',text:'Quintette du Hot Club de France — первый джаз-клуб'}],
+        artifacts:['Афиша Hot Club','Селимер','Кафе-концерт'],
+        audio:''
+      },
+      USSR:{
+        architects:[
+          {name:'Валентин Парнах',role:'первый джаз-банд в РСФСР',photo:''},
+          {name:'Александр Цфасман',role:'оркестр',photo:''},
+          {name:'Леопольд Теплицкий',role:'оркестр',photo:''}
+        ],
+        tech:[
+          {year:'1922',text:'1 октября — первый джазовый концерт в РСФСР'},
+          {year:'1938',text:'Государственный джаз-оркестр СССР'},
+          {year:'1948',text:'«Эпоха разгибания саксофонов» — джаз под запретом'},
+          {year:'1957',text:'Московский фестиваль молодёжи — джаз возвращается'}
+        ],
+        artifacts:['Магнитофон','Рентген-плёнка','Квартирник','Плакат фестиваля'],
+        audio:''
+      }
+    }
+  },
+  {
+    id:'rock', years:'1950–2000', name:'Рок', sub:'электрогитара · бунт · стадионы',
+    hero:'https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?w=1200&q=80',
+    ambient:'https://upload.wikimedia.org/wikipedia/commons/6/6e/Chuck_Berry_-_Johnny_B._Goode.ogg',
+    spirit:'Рок вырос в 1950-х из ритм-энд-блюза, кантри и госпела. Элвис Пресли сделал рок-н-ролл глобальным явлением, а Чак Берри задал стандарт гитарного риффа. В 1960-х «британское вторжение» (The Beatles, The Rolling Stones) разделило рок на два лица — мелодию и бунт. 1970-е — хард-рок (Led Zeppelin, Deep Purple), панк (Sex Pistols). 1980-е — метал (Metallica, Iron Maiden) и русский рок (Кино, Ария). 1990-е — гранж (Nirvana) и брит-поп (Oasis, Blur).',
+    countries:{
+      USA:{
+        architects:[
+          {name:'Элвис Пресли',role:'король рок-н-ролла',photo:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Elvis_Presley_1970.jpg/240px-Elvis_Presley_1970.jpg'},
+          {name:'Чак Берри',role:'гитара, риффы',photo:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Chuck_Berry_1957.jpg/240px-Chuck_Berry_1957.jpg'},
+          {name:'Джими Хендрикс',role:'психоделия, гитара',photo:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Jimi_Hendrix_1967.jpg/240px-Jimi_Hendrix_1967.jpg'},
+          {name:'Курт Кобейн',role:'гранж',photo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Kurt_Cobain_1992.jpg/240px-Kurt_Cobain_1992.jpg'}
+        ],
+        tech:[
+          {year:'1950',text:'Fender Telecaster — серийная электрогитара'},
+          {year:'1954',text:'Fender Stratocaster'},
+          {year:'1965',text:'Fuzz-педаль — искажение звука'},
+          {year:'1991',text:'MTV и видеоклипы как часть продвижения'}
+        ],
+        artifacts:['Gibson Les Paul','Винил 45 rpm','Кожаная куртка','Плакат Вудстока','Fender Strat','Барабаны'],
+        audio:'https://upload.wikimedia.org/wikipedia/commons/6/6e/Chuck_Berry_-_Johnny_B._Goode.ogg'
+      },
+      UK:{
+        architects:[
+          {name:'The Beatles',role:'бит, поп-рок',photo:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/The_Beatles_in_America.JPG/240px-The_Beatles_in_America.JPG'},
+          {name:'The Rolling Stones',role:'блюз-рок',photo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Rolling_Stones_1965.jpg/240px-Rolling_Stones_1965.jpg'},
+          {name:'Led Zeppelin',role:'хард-рок',photo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Led_Zeppelin_1975.jpg/240px-Led_Zeppelin_1975.jpg'},
+          {name:'Oasis',role:'брит-поп',photo:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Oasis_1997.jpg/240px-Oasis_1997.jpg'}
+        ],
+        tech:[
+          {year:'1962',text:'Marshall-усилители — громче'},
+          {year:'1967',text:'Mellotron — первые сэмплы'},
+          {year:'1980',text:'MTV делает клипы частью продвижения'}
+        ],
+        artifacts:['Обложка Sgt. Pepper','Мод-костюм','Клуб Cavern','Бас-гитара'],
+        audio:''
+      },
+      USSR:{
+        architects:[
+          {name:'Виктор Цой',role:'Кино, пост-панк',photo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Viktor_Tsoi.jpg/240px-Viktor_Tsoi.jpg'},
+          {name:'Nautilus Pompilius',role:'интеллектуальный романтизм',photo:''},
+          {name:'Ария',role:'хэви-метал',photo:''},
+          {name:'Король и Шут',role:'фэнтези-панк',photo:''}
+        ],
+        tech:[
+          {year:'1980',text:'«Перестройка» — рокеры выходят из подполья'},
+          {year:'1987',text:'Ленинградский рок-клуб'}
+        ],
+        artifacts:['Магнитофон','Рентген-плёнка','Квартирник','Стена Цоя','Гитара'],
+        audio:''
+      }
+    }
+  },
+  {
+    id:'electronic', years:'1950–2020', name:'Электроника', sub:'синтезаторы · драм-машины · EDM',
+    hero:'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1200&q=80',
+    ambient:'https://upload.wikimedia.org/wikipedia/commons/1/1c/Kraftwerk_-_Autobahn.ogg',
+    spirit:'Электронная музыка выросла из экспериментов с электрическими инструментами конца XIX века (телгармониум, терменвокс). В 1950-х Шеффер и Штокхаузен работали с магнитной лентой, в 1960-х появился Moog, а Венди Карлос популяризировала синтезатор альбомом Switched-On Bach. В 1980-х в Детройте Хуан Аткинс, Деррик Мэй и Кевин Сондерсон создали электро, а Kraftwerk и Daft Punk превратили его в мировую танцевальную сцену. В XXI веке — EDM, electropop, future bass.',
+    countries:{
+      Germany:{
+        architects:[
+          {name:'Kraftwerk',role:'танцевальная электроника',photo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Kraftwerk_2013.jpg/240px-Kraftwerk_2013.jpg'},
+          {name:'Карлхайнц Штокхаузен',role:'электронная манипуляция',photo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Stockhausen.jpg/240px-Stockhausen.jpg'},
+          {name:'Венди Карлос',role:'Switched-On Bach',photo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Wendy_Carlos.jpg/240px-Wendy_Carlos.jpg'}
+        ],
+        tech:[
+          {year:'1950',text:'Магнитная лента и генераторы — первые электронные студии'},
+          {year:'1968',text:'Moog Modular; Switched-On Bach'},
+          {year:'1970',text:'Kraftwerk — танцевальная электроника'},
+          {year:'1974',text:'Autobahn — альбом-манифест'}
+        ],
+        artifacts:['Moog','Секвенсор','Обложка Autobahn','Драм-машина'],
+        audio:'https://upload.wikimedia.org/wikipedia/commons/1/1c/Kraftwerk_-_Autobahn.ogg'
+      },
+      USA:{
+        architects:[
+          {name:'Хуан Аткинс',role:'электро, Детройт',photo:''},
+          {name:'Деррик Мэй',role:'электро, Детройт',photo:''},
+          {name:'Кевин Сондерсон',role:'электро, Детройт',photo:''}
+        ],
+        tech:[
+          {year:'1980',text:'Детройтское электро — Clear (Cybotron)'},
+          {year:'1997',text:'Daft Punk — Homework'},
+          {year:'2000',text:'Electroclash, electropop, future bass, EDM'}
+        ],
+        artifacts:['Синтезатор','Драм-машина','Обложка Homework','Наушники'],
+        audio:''
+      },
+      France:{
+        architects:[
+          {name:'Пьер Шеффер',role:'конкретная музыка',photo:''},
+          {name:'Daft Punk',role:'электро и house',photo:''},
+          {name:'Miss Kittin',role:'electroclash',photo:''}
+        ],
+        tech:[
+          {year:'1950',text:'Конкретная музыка (musique concrète)'},
+          {year:'1997',text:'Daft Punk — Homework'},
+          {year:'2000',text:'Electroclash и electropop'}
+        ],
+        artifacts:['Магнитофон','Плёнка','Обложка Homework','Синтезатор'],
+        audio:''
+      }
+    }
+  }
+];
+
+/* =========================================================
+   2. СОСТОЯНИЕ
+   ========================================================= */
+let currentEra = null;
+let currentCountry = null;
+
+const timelineEl   = document.getElementById('timeline');
+const countryBarEl = document.getElementById('countryBar');
+const contentEl    = document.getElementById('epochContent');
+const player       = document.getElementById('player');
+
+/* =========================================================
+   3. ТАЙМЛАЙН
+   ========================================================= */
+function renderTimeline(){
+  timelineEl.innerHTML = ERAS.map(era => `
+    <div class="segment" data-era="${era.id}">
+      <div class="era-years">${era.years}</div>
+      <div class="era-name">${era.name}</div>
+      <div class="era-sub">${era.sub}</div>
+    </div>
+  `).join('');
+
+  timelineEl.querySelectorAll('.segment').forEach(seg => {
+    seg.addEventListener('click', () => selectEra(seg.dataset.era));
+  });
+}
+
+function selectEra(id){
+  currentEra = ERAS.find(e => e.id === id);
+  currentCountry = Object.keys(currentEra.countries)[0];
+
+  timelineEl.querySelectorAll('.segment').forEach(s => {
+    s.classList.toggle('active', s.dataset.era === id);
+  });
+
+  renderCountries();
+  renderEpoch();
+}
+
+/* =========================================================
+   4. СТРАНЫ
+   ========================================================= */
+const COUNTRY_LABELS = {
+  Austria:'Австрия', Germany:'Германия', France:'Франция',
+  USA:'США', UK:'Великобритания', USSR:'СССР'
+};
+
+function renderCountries(){
+  if(!currentEra) return;
+  const keys = Object.keys(currentEra.countries);
+  countryBarEl.innerHTML = keys.map(k => `
+    <button class="country-btn ${k === currentCountry ? 'active' : ''}" data-country="${k}">
+      ${COUNTRY_LABELS[k] || k}
+    </button>
+  `).join('');
+
+  countryBarEl.querySelectorAll('.country-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentCountry = btn.dataset.country;
+      renderCountries();
+      renderEpoch();
+    });
+  });
+}
+
+/* =========================================================
+   5. РЕНДЕР ЭПОХИ
+   ========================================================= */
+function renderEpoch(){
+  if(!currentEra || !currentCountry) return;
+  const era = currentEra;
+  const c = era.countries[currentCountry];
+
+  const idx = ERAS.findIndex(e => e.id === era.id);
+  const nextEra = ERAS[idx + 1];
+  
+  document.querySelector('header').style.backgroundImage =
+  `linear-gradient(rgba(30,22,16,.82), rgba(30,22,16,.96)), url('${era.hero}')`;
+
+  contentEl.classList.remove('visible');
+  void contentEl.offsetWidth;
+
+  contentEl.innerHTML = `
+    <div class="epoch-hero">
+      <div class="years">${era.years}</div>
+      <h2>${era.name}</h2>
+      <div class="country-tag">${COUNTRY_LABELS[currentCountry] || currentCountry}</div>
+      <button class="ambient-btn" id="ambientBtn" ${era.ambient ? '' : 'disabled'}>
+        ▶ Включить атмосферу
+      </button>
+    </div>
+
+   <div class="blocks">
+  <!-- Дух времени -->
+  <div class="block block-wide">
+    <h3>Дух времени</h3>
+    <p>${era.spirit}</p>
+    <div class="sub">${era.sub}</div>
+  </div>
+
+  <!-- Архитекторы звука -->
+  <div class="block block-wide">
+    <h3>Архитекторы звука</h3>
+    <div class="architects">
+      ${c.architects.map(a => `
+        <div class="architect">
+          <div class="avatar">
+            ${a.photo ? `<img src="${a.photo}" alt="${a.name}" loading="lazy">` : 'фото'}
+          </div>
+          <div class="name">${a.name}</div>
+          <div class="role">${a.role}</div>
+        </div>
+      `).join('')}
+    </div>
+  </div>
+
+  <!-- Технологии и инструменты -->
+  <div class="block">
+    <h3>Технологии и инструменты</h3>
+    <ul class="tech-list">
+      ${c.tech.map(t => `<li><span class="year">${t.year}</span><span>${t.text}</span></li>`).join('')}
+    </ul>
+  </div>
+
+  <!-- Артефакты эпохи -->
+  <div class="block">
+    <h3>Артефакты эпохи</h3>
+    <div class="gallery">
+      ${c.artifacts.map(a => `
+        <figure class="artifact-item">
+          <div class="artifact">
+            ${a.img ? `<img src="${a.img}" alt="${a.name}">` : `<span>${a.name}</span>`}
+          </div>
+          <figcaption>${a.name}</figcaption>
+        </figure>
+      `).join('')}
+    </div>
+  </div>
+</div>
+
+    ${nextEra ? `
+      <div class="next-era">
+        <button id="nextEraBtn">Перейти к эпохе «${nextEra.name}» →</button>
+      </div>
+    ` : `
+      <div class="placeholder">Вы прошли все эпохи. <strong>Спасибо!</strong></div>
+    `}
+
+    <div class="epoch-footer">
+      <h4>Конец эпохи</h4>
+      <p>${era.name} · ${COUNTRY_LABELS[currentCountry] || currentCountry} · ${era.years}</p>
+    </div>
+  `;
+
+  contentEl.classList.add('visible');
+
+  const ambientBtn = contentEl.querySelector('#ambientBtn');
+  if(ambientBtn && era.ambient){
+    ambientBtn.addEventListener('click', () => toggleAmbient(era.ambient, ambientBtn));
+  }
+
+  const nextBtn = contentEl.querySelector('#nextEraBtn');
+  if(nextBtn && nextEra){
+    nextBtn.addEventListener('click', () => {
+      selectEra(nextEra.id);
+      document.querySelector('.timeline-section').scrollIntoView({behavior:'smooth', block:'start'});
+    });
+  }
+}
+
+/* =========================================================
+   6. АУДИО
+   ========================================================= */
+function toggleAmbient(src, btn){
+  // если включён другой трек — сбрасываем на новый
+  if(!player.src || player.src.indexOf(src) === -1){
+    player.pause();
+    player.src = src;
+    player.load();
+  }
+
+  // если уже играет — ставим паузу
+  if(!player.paused){
+    player.pause();
+    btn.textContent = '▶ Включить атмосферу';
+    btn.classList.remove('playing');
+    return;
+  }
+
+  // иначе — включаем
+  player.play().then(() => {
+    btn.textContent = '❚❚ Пауза';
+    btn.classList.add('playing');
+  }).catch(() => {
+    btn.textContent = '⚠ Аудио недоступно';
+  });
+}
+/* =========================================================
+   7. СТАРТ
+   ========================================================= */
+renderTimeline();
+selectEra('classic');
+</script>
+</body>
+</html>
